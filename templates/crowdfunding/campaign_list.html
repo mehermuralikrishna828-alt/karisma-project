@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% load karisma_tags %}
+{% block title %}Crowdfunding campaigns{% endblock %}
+{% block content %}
+<div class="container page-head">
+  <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+    <div>
+      <div class="eyebrow">Crowdfunding</div>
+      <h1 class="mb-1">Back a campaign that matters</h1>
+      <p class="text-muted mb-0">{{ page_obj.paginator.count|default:0 }} campaign{{ page_obj.paginator.count|pluralize }} found</p>
+    </div>
+    <a href="{% url 'crowdfunding:create' %}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i> Start a campaign</a>
+  </div>
+
+  <form method="get" class="filter-bar mb-4" role="search" data-no-loading>
+    <div class="row g-2 align-items-end">
+      <div class="col-lg-4">
+        <label class="form-label small" for="q">Search</label>
+        <input type="search" id="q" name="q" value="{{ filters.q }}" class="form-control" placeholder="Title, category, description, city…">
+      </div>
+      <div class="col-6 col-lg-2">
+        <label class="form-label small" for="category">Category</label>
+        <select id="category" name="category" class="form-select">
+          <option value="">All</option>
+          {% for value, label in categories %}<option value="{{ value }}" {% if filters.category == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="col-6 col-lg-2">
+        <label class="form-label small" for="status">Status</label>
+        <select id="status" name="status" class="form-select">
+          <option value="">Any</option>
+          <option value="active" {% if filters.status == 'active' %}selected{% endif %}>Open for support</option>
+          <option value="ending" {% if filters.status == 'ending' %}selected{% endif %}>Ending this week</option>
+          <option value="funded" {% if filters.status == 'funded' %}selected{% endif %}>Fully funded</option>
+          <option value="ended" {% if filters.status == 'ended' %}selected{% endif %}>Ended</option>
+        </select>
+      </div>
+      <div class="col-6 col-lg-2">
+        <label class="form-label small" for="sort">Sort by</label>
+        <select id="sort" name="sort" class="form-select">
+          <option value="recent" {% if filters.sort == 'recent' %}selected{% endif %}>Recently created</option>
+          <option value="popular" {% if filters.sort == 'popular' %}selected{% endif %}>Most popular</option>
+          <option value="deadline" {% if filters.sort == 'deadline' %}selected{% endif %}>Deadline (soonest)</option>
+          <option value="funded" {% if filters.sort == 'funded' %}selected{% endif %}>Most funded</option>
+        </select>
+      </div>
+      <div class="col-6 col-lg-2 d-grid"><button type="submit" class="btn btn-primary"><i class="bi bi-funnel me-1"></i> Apply</button></div>
+    </div>
+    <div class="d-flex flex-wrap justify-content-between align-items-center mt-3">
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="verified" value="1" id="verified" {% if filters.verified == '1' %}checked{% endif %} onchange="this.form.submit()">
+        <label class="form-check-label small fw-semibold" for="verified"><i class="bi bi-patch-check-fill verified-inline"></i> Verified only</label>
+      </div>
+      {% if has_filters %}<a href="{% url 'crowdfunding:list' %}" class="small fw-bold">Clear filters</a>{% endif %}
+    </div>
+  </form>
+
+  <div class="row g-4">
+    {% for campaign in campaigns %}
+      <div class="col-md-6 col-lg-4">{% include "partials/campaign_card.html" %}</div>
+    {% empty %}
+      <div class="col-12">
+        {% include "partials/empty_state.html" with icon="bi-search-heart" title="No campaigns match your filters" text="Try a different search term or clear the filters." cta_url="/crowdfunding/" cta_label="Show all campaigns" %}
+      </div>
+    {% endfor %}
+  </div>
+  {% include "partials/pagination.html" %}
+</div>
+{% endblock %}

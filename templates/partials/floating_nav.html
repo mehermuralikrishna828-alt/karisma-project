@@ -1,0 +1,9 @@
+<nav class="k-dock" aria-label="Primary navigation">
+  {% for item in nav_items %}
+    <a href="{% url item.url %}" class="{% if active_nav == item.key %}active{% endif %}"
+       {% if active_nav == item.key %}aria-current="page"{% endif %} aria-label="{{ item.label }}" title="{{ item.label }}">
+      <i class="bi {{ item.icon }}"></i>
+      <span class="dock-label">{{ item.label }}</span>
+    </a>
+  {% endfor %}
+</nav>

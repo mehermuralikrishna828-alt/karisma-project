@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load karisma_tags %}
+{% block title %}Thank you{% endblock %}
+{% block content %}
+<div class="container page-head">
+  <div class="auth-card k-panel p-4 p-md-5 text-center" style="max-width:600px">
+    <div class="display-3 text-success mb-2"><i class="bi bi-check-circle-fill"></i></div>
+    <h1 class="h3">Thank you, {{ donation.donor_name }}!</h1>
+    {% if donation.is_money %}
+      <p class="text-muted">Your demo donation of <strong class="text-body">{{ donation.amount|inr }}</strong> to <strong class="text-body">{{ donation.target_title }}</strong> has been recorded.</p>
+    {% elif donation.category.slug == 'blood' %}
+      <p class="text-muted">You're registered as a blood donor. A coordinator will contact you to confirm the next steps.</p>
+    {% else %}
+      <p class="text-muted">Your <strong class="text-body">{{ donation.category.name }}</strong> donation ({{ donation.quantity }} item{{ donation.quantity|pluralize }}) is {{ donation.get_status_display|lower }}. Our volunteers will get in touch with you.</p>
+    {% endif %}
+    <div class="text-start p-3 rounded-4 my-4" style="background:#f8fafc">
+      <div class="d-flex justify-content-between small"><span class="text-muted">Reference</span><strong>{{ donation.reference }}</strong></div>
+      <div class="d-flex justify-content-between small"><span class="text-muted">Date</span><strong>{{ donation.created_at|date:"d M Y, h:i A" }}</strong></div>
+      <div class="d-flex justify-content-between small"><span class="text-muted">Status</span><strong>{{ donation.get_status_display }}</strong></div>
+      {% for label, value in donation.details_items %}
+        <div class="d-flex justify-content-between small"><span class="text-muted">{{ label }}</span><strong>{{ value }}</strong></div>
+      {% endfor %}
+    </div>
+    {% if donation.is_money %}<p class="small text-muted"><i class="bi bi-shield-exclamation"></i> This was a simulated payment. No money was charged.</p>{% endif %}
+    <div class="d-flex flex-wrap gap-2 justify-content-center">
+      <a href="{% url 'dashboard:history' %}" class="btn btn-primary">View donation history</a>
+      {% if donation.campaign %}<a href="{{ donation.campaign.get_absolute_url }}" class="btn btn-outline-primary">Back to campaign</a>
+      {% elif donation.cause %}<a href="{{ donation.cause.get_absolute_url }}" class="btn btn-outline-primary">Back to cause</a>
+      {% else %}<a href="{% url 'donations:index' %}" class="btn btn-outline-primary">Donate more</a>{% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

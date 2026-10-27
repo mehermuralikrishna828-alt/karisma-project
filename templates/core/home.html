@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+{% load static karisma_tags %}
+{% block title %}Small acts, big change{% endblock %}
+
+{% block content %}
+<!-- Hero -->
+<section class="k-hero">
+  <div class="container">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-7">
+        <span class="badge rounded-pill text-bg-light mb-3 px-3 py-2"><i class="bi bi-stars text-warning"></i> India's community giving platform</span>
+        <h1 class="mb-3">Small acts of kindness, <span style="color:#fcd34d">big change.</span></h1>
+        <p class="lead mb-4">Back a campaign, donate items, give blood or fund lasting causes. Karisma connects people who want to help with the communities that need it most.</p>
+        <form action="{% url 'crowdfunding:list' %}" method="get" class="hero-search mb-4" role="search" data-no-loading>
+          <input type="search" name="q" class="form-control" placeholder="Search campaigns - medical, education, flood relief…" aria-label="Search campaigns">
+          <button class="btn btn-primary px-4" type="submit"><i class="bi bi-search"></i><span class="d-none d-sm-inline ms-1">Search</span></button>
+        </form>
+        <div class="d-flex flex-wrap gap-2">
+          <a href="{% url 'crowdfunding:list' %}" class="btn btn-accent btn-lg"><i class="bi bi-rocket-takeoff me-1"></i> Explore campaigns</a>
+          <a href="{% url 'crowdfunding:create' %}" class="btn btn-glass btn-lg">Start a campaign</a>
+        </div>
+      </div>
+      <div class="col-lg-5 d-none d-lg-block">
+        <div class="d-grid gap-3">
+          <div class="k-glass hero-tile"><div class="small opacity-75">Raised on Karisma</div><div class="big">{{ stats.total_raised|compact_inr }}</div></div>
+          <div class="k-glass hero-tile"><div class="small opacity-75">Active campaigns</div><div class="big">{{ stats.campaigns }}</div></div>
+          <div class="k-glass hero-tile"><div class="small opacity-75">Items &amp; blood units donated</div><div class="big">{{ stats.items }}</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Mission -->
+<section class="section">
+  <div class="container">
+    <div class="row g-4 align-items-center">
+      <div class="col-lg-5">
+        <div class="eyebrow mb-2">Our mission</div>
+        <h2 class="section-title mb-3">Make giving simple, transparent and personal.</h2>
+        <p class="text-muted">Every campaign is reviewed, every rupee is tracked and every supporter sees the impact. Whether you have ₹100, an old laptop or an hour to spare, there is a place for you here.</p>
+      </div>
+      <div class="col-lg-7">
+        <div class="row g-3">
+          <div class="col-sm-4"><div class="stat-card"><div class="icon grad-teal"><i class="bi bi-patch-check"></i></div><h3 class="h6">Verified</h3><p class="small text-muted mb-0">Campaigns checked by our team carry a verification badge.</p></div></div>
+          <div class="col-sm-4"><div class="stat-card"><div class="icon grad-amber"><i class="bi bi-graph-up-arrow"></i></div><h3 class="h6">Transparent</h3><p class="small text-muted mb-0">Live progress, supporter lists and regular creator updates.</p></div></div>
+          <div class="col-sm-4"><div class="stat-card"><div class="icon grad-rose"><i class="bi bi-box2-heart"></i></div><h3 class="h6">More than money</h3><p class="small text-muted mb-0">Donate food, clothes, e-waste, books, or even blood.</p></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Featured campaigns -->
+<section class="section pt-0">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-end mb-4">
+      <div><div class="eyebrow">Crowdfunding</div><h2 class="section-title mb-0">Featured campaigns</h2></div>
+      <a href="{% url 'crowdfunding:list' %}" class="btn btn-outline-primary btn-sm">View all <i class="bi bi-arrow-right"></i></a>
+    </div>
+    <div class="row g-4">
+      {% for campaign in featured_campaigns %}
+        <div class="col-md-6 col-lg-4">{% include "partials/campaign_card.html" %}</div>
+      {% empty %}
+        <div class="col-12">{% include "partials/empty_state.html" with icon="bi-rocket-takeoff" title="No campaigns yet" text="Be the first to start a campaign." cta_url="/crowdfunding/create/" cta_label="Start a campaign" %}</div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Donation categories -->
+<section class="section" style="background:#fff">
+  <div class="container">
+    <div class="text-center mb-4">
+      <div class="eyebrow">Donations</div>
+      <h2 class="section-title">Give in the way that suits you</h2>
+      <p class="text-muted">Pick a category - each one has its own simple form.</p>
+    </div>
+    <div class="row g-3 row-cols-2 row-cols-md-4">
+      {% for category in categories %}
+        <div class="col">
+          <a href="{% url 'donations:category' slug=category.slug %}" class="cat-tile">
+            <div class="icon {{ category.gradient }}"><i class="bi {{ category.icon }}"></i></div>
+            <h3>{{ category.name }}</h3>
+            <p class="small text-muted mb-0 d-none d-sm-block">{{ category.description|truncatechars:60 }}</p>
+          </a>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Featured causes -->
+<section class="section">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-end mb-4">
+      <div><div class="eyebrow">Philanthropy</div><h2 class="section-title mb-0">Causes that change lives</h2></div>
+      <a href="{% url 'philanthropy:list' %}" class="btn btn-outline-primary btn-sm">All causes <i class="bi bi-arrow-right"></i></a>
+    </div>
+    <div class="row g-4">
+      {% for cause in featured_causes %}
+        <div class="col-md-6 col-lg-4">{% include "partials/cause_card.html" %}</div>
+      {% empty %}
+        <div class="col-12">{% include "partials/empty_state.html" with icon="bi-globe-central-south-asia" title="Causes are coming soon" text="Run the seed command or add causes in the admin panel." %}</div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Impact statistics -->
+<section class="container">
+  <div class="impact-band text-center">
+    <div class="eyebrow text-warning mb-2">Our impact so far</div>
+    <h2 class="text-white mb-4">Together, we're making a difference</h2>
+    <div class="row g-4">
+      <div class="col-6 col-md-3"><div class="value" data-countup="{{ stats.total_raised|floatformat:0 }}" data-prefix="₹">₹0</div><div class="label">raised (demo)</div></div>
+      <div class="col-6 col-md-3"><div class="value" data-countup="{{ stats.campaigns }}">0</div><div class="label">campaigns</div></div>
+      <div class="col-6 col-md-3"><div class="value" data-countup="{{ stats.donors }}">0</div><div class="label">generous donors</div></div>
+      <div class="col-6 col-md-3"><div class="value" data-countup="{{ stats.items }}">0</div><div class="label">items &amp; blood units</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- Recent campaigns -->
+<section class="section">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-end mb-4">
+      <div><div class="eyebrow">Fresh on Karisma</div><h2 class="section-title mb-0">Recent campaigns</h2></div>
+      <a href="{% url 'crowdfunding:list' %}?sort=recent" class="btn btn-outline-primary btn-sm">See more <i class="bi bi-arrow-right"></i></a>
+    </div>
+    <div class="row g-4">
+      {% for campaign in recent_campaigns %}
+        <div class="col-md-6 col-lg-4">{% include "partials/campaign_card.html" %}</div>
+      {% empty %}
+        <div class="col-12">{% include "partials/empty_state.html" with icon="bi-hourglass" title="Nothing here yet" text="New campaigns will show up here." %}</div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Call to action -->
+<section class="container pb-4">
+  <div class="k-hero text-center" style="border-radius:34px;padding:3.2rem 1.5rem">
+    <div class="container">
+      <h2 class="text-white mb-2">Have a cause close to your heart?</h2>
+      <p class="lead mx-auto mb-4">Start a campaign in minutes, or become a supporter and brighten someone's day.</p>
+      <div class="d-flex flex-wrap gap-2 justify-content-center">
+        <a href="{% url 'crowdfunding:create' %}" class="btn btn-accent btn-lg">Start a campaign</a>
+        <a href="{% url 'donations:index' %}" class="btn btn-glass btn-lg">Donate items</a>
+        {% if not user.is_authenticated %}<a href="{% url 'accounts:register' %}" class="btn btn-glass btn-lg">Create account</a>{% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

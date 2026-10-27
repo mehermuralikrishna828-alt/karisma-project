@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Delete campaign{% endblock %}
+{% block content %}
+<div class="container page-head">
+  <div class="auth-card k-panel p-4 p-md-5 text-center">
+    <div class="display-5 text-danger mb-2"><i class="bi bi-trash3"></i></div>
+    <h1 class="h4">Delete “{{ object.title }}”?</h1>
+    {% if object.donations.exists %}
+      <div class="alert alert-warning rounded-4 mt-3">This campaign already has donations, so it can't be deleted. Close or cancel it from the edit page instead.</div>
+      <a href="{% url 'crowdfunding:edit' slug=object.slug %}" class="btn btn-primary">Edit campaign</a>
+    {% else %}
+      <p class="text-muted">This can't be undone.</p>
+      <form method="post">{% csrf_token %}
+        <button type="submit" class="btn btn-danger">Yes, delete</button>
+        <a href="{{ object.get_absolute_url }}" class="btn btn-light">Keep it</a>
+      </form>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

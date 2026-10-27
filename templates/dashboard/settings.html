@@ -1,0 +1,22 @@
+{% extends "dashboard/base_dashboard.html" %}
+{% block title %}Account settings{% endblock %}
+{% block dash_content %}
+<div class="row g-4">
+  <div class="col-lg-8">
+    <form method="post" enctype="multipart/form-data" class="k-panel p-4" novalidate>
+      {% csrf_token %}
+      <h2 class="h5 mb-3">Profile</h2>
+      <div class="row g-3">
+        {% for field in user_form %}<div class="col-md-6">{% include "partials/form_field.html" %}</div>{% endfor %}
+        {% for field in profile_form %}<div class="{% if field.name == 'bio' or field.name == 'avatar' %}col-12{% else %}col-md-6{% endif %}">{% include "partials/form_field.html" %}</div>{% endfor %}
+      </div>
+      <button type="submit" class="btn btn-primary mt-4 px-4">Save changes</button>
+    </form>
+  </div>
+  <div class="col-lg-4">
+    <div class="k-panel mb-3"><h2 class="h6">Security</h2><p class="small text-muted">Use a strong password you don't use elsewhere.</p><a href="{% url 'accounts:password_change' %}" class="btn btn-outline-primary btn-sm">Change password</a></div>
+    <div class="k-panel"><h2 class="h6">Session</h2>
+      <form method="post" action="{% url 'accounts:logout' %}" data-no-loading>{% csrf_token %}<button class="btn btn-light btn-sm text-danger">Log out</button></form></div>
+  </div>
+</div>
+{% endblock %}

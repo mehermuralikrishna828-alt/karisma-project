@@ -1,0 +1,41 @@
+{% load karisma_tags %}
+<article class="k-card campaign-card h-100" data-reveal>
+  <a href="{{ campaign.get_absolute_url }}" class="k-cover {% if not campaign.image %}{{ campaign.gradient }}{% endif %}" aria-label="{{ campaign.title }}">
+    {% if campaign.image %}<img src="{{ campaign.image.url }}" alt="" loading="lazy">{% else %}<i class="bi {{ campaign.icon }}"></i>{% endif %}
+    <span class="k-chip chip-cat">{{ campaign.get_category_display }}</span>
+    {% if campaign.is_verified %}<span class="k-chip chip-verified"><i class="bi bi-patch-check-fill"></i> Verified</span>{% endif %}
+    {% if campaign.status != 'active' or campaign.is_expired %}<span class="k-chip chip-status">{{ campaign.status_label }}</span>{% endif %}
+  </a>
+  <div class="k-card-body">
+    <h3 class="k-card-title"><a href="{{ campaign.get_absolute_url }}">{{ campaign.title }}</a></h3>
+    <p class="text-muted small mb-3">{{ campaign.short_description }}</p>
+    <a href="{% url 'accounts:profile' username=campaign.creator.username %}" class="d-flex align-items-center gap-2 small text-muted mb-3">
+      <span class="k-avatar sm">{{ campaign.creator|initials }}</span>
+      <span>by <strong class="text-body">{{ campaign.creator|display_name }}</strong></span>
+    </a>
+    <div class="mt-auto">
+      <div class="d-flex justify-content-between align-items-baseline mb-2">
+        <span class="amount-raised">{{ campaign.amount_raised|inr }}</span>
+        <span class="small text-muted">of {{ campaign.target_amount|inr }}</span>
+      </div>
+      {% include "partials/progress.html" with percent=campaign.progress_percent size="" %}
+      <div class="d-flex justify-content-between small text-muted mt-2 mb-3">
+        <span><strong class="text-body">{{ campaign.raw_percent }}%</strong> funded</span>
+        <span><i class="bi bi-people"></i> {{ campaign.contributors_count }} contributor{{ campaign.contributors_count|pluralize }}</span>
+        <span {% if campaign.is_ending_soon %}class="text-danger fw-semibold"{% endif %}>
+          <i class="bi bi-clock"></i>
+          {% if campaign.is_accepting %}{{ campaign.days_left }} day{{ campaign.days_left|pluralize }} left{% else %}{{ campaign.deadline|date:"d M Y" }}{% endif %}
+        </span>
+      </div>
+      <div class="d-flex gap-2">
+        {% if campaign.is_accepting %}
+          <a href="{% url 'donations:flow' kind='campaign' slug=campaign.slug step='amount' %}" class="btn btn-primary flex-grow-1"><i class="bi bi-heart-fill me-1"></i> Support</a>
+        {% else %}
+          <a href="{{ campaign.get_absolute_url }}" class="btn btn-outline-primary flex-grow-1">View</a>
+        {% endif %}
+        {% url 'crowdfunding:toggle_save' slug=campaign.slug as save_url %}
+        {% include "partials/save_button.html" with url=save_url saved=campaign.pk|in_set:saved_campaign_ids %}
+      </div>
+    </div>
+  </div>
+</article>

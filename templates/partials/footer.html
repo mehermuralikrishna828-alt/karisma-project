@@ -1,0 +1,43 @@
+{% load static %}
+<footer class="k-footer">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-lg-5">
+        <a href="{% url 'core:home' %}" class="k-brand text-white mb-3"><img src="{% static 'images/logo.svg' %}" alt="" width="36" height="36"> Karisma</a>
+        <p class="mb-3" style="max-width:26rem">A community platform where small acts of kindness add up to big change - crowdfund causes you care about, donate items, give blood or back long-term philanthropy.</p>
+        <span class="badge text-bg-warning"><i class="bi bi-info-circle me-1"></i>Demo platform - all payments are simulated</span>
+      </div>
+      <div class="col-6 col-lg-2 offset-lg-1">
+        <h6>Explore</h6>
+        <ul class="list-unstyled small d-grid gap-2">
+          <li><a href="{% url 'crowdfunding:list' %}">Crowdfunding</a></li>
+          <li><a href="{% url 'donations:index' %}">Donations</a></li>
+          <li><a href="{% url 'philanthropy:list' %}">Philanthropy</a></li>
+          <li><a href="{% url 'dashboard:home' %}">Dashboard</a></li>
+        </ul>
+      </div>
+      <div class="col-6 col-lg-2">
+        <h6>Get involved</h6>
+        <ul class="list-unstyled small d-grid gap-2">
+          <li><a href="{% url 'crowdfunding:create' %}">Start a campaign</a></li>
+          <li><a href="{% url 'donations:category' slug='blood' %}">Give blood</a></li>
+          <li><a href="{% url 'donations:category' slug='food' %}">Donate food</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2">
+        <h6>Account</h6>
+        <ul class="list-unstyled small d-grid gap-2">
+          {% if user.is_authenticated %}
+            <li><a href="{% url 'dashboard:settings' %}">Settings</a></li>
+            <li><a href="{% url 'dashboard:history' %}">Donation history</a></li>
+          {% else %}
+            <li><a href="{% url 'accounts:login' %}">Log in</a></li>
+            <li><a href="{% url 'accounts:register' %}">Register</a></li>
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+    <hr class="border-secondary my-4">
+    <p class="small mb-0">© {% now "Y" %} Karisma · Made with <i class="bi bi-heart-fill text-danger"></i> in India. Demo project - no real money moves through this site.</p>
+  </div>
+</footer>

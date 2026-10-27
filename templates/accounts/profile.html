@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% load karisma_tags %}
+{% block title %}{{ profile_user|display_name }}{% endblock %}
+{% block content %}
+<div class="container page-head">
+  <div class="k-panel d-flex flex-column flex-sm-row gap-4 align-items-sm-center">
+    <span class="k-avatar lg">{% if profile_user.profile.avatar %}<img src="{{ profile_user.profile.avatar.url }}" alt="">{% else %}{{ profile_user|initials }}{% endif %}</span>
+    <div>
+      <h1 class="h3 mb-1">{{ profile_user|display_name }}</h1>
+      <div class="text-muted">@{{ profile_user.username }}{% if profile_user.profile.location %} · <i class="bi bi-geo-alt"></i> {{ profile_user.profile.location }}{% endif %}</div>
+      {% if profile_user.profile.bio %}<p class="mb-0 mt-2">{{ profile_user.profile.bio }}</p>{% endif %}
+      <div class="small text-muted mt-2">Member since {{ profile_user.date_joined|date:"F Y" }}</div>
+    </div>
+  </div>
+  <h2 class="h4 mt-5 mb-3">Campaigns by {{ profile_user.first_name|default:profile_user.username }}</h2>
+  <div class="row g-4">
+    {% for campaign in campaigns %}
+      <div class="col-md-6 col-lg-4">{% include "partials/campaign_card.html" %}</div>
+    {% empty %}
+      <div class="col-12">{% include "partials/empty_state.html" with icon="bi-rocket-takeoff" title="No campaigns yet" text="This member hasn't started a campaign." %}</div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

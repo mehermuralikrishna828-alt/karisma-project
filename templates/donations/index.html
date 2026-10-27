@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% load karisma_tags %}
+{% block title %}Donations{% endblock %}
+{% block content %}
+<div class="container page-head">
+  <div class="eyebrow">Donations</div>
+  <h1 class="mb-1">What would you like to give?</h1>
+  <p class="text-muted mb-4">Choose a category to open its donation form. Our volunteers handle collection and delivery.</p>
+
+  <div class="row g-3 row-cols-2 row-cols-md-4 mb-5">
+    {% for category in categories %}
+      <div class="col" data-reveal>
+        <a href="{% url 'donations:category' slug=category.slug %}" class="cat-tile">
+          <div class="icon {{ category.gradient }}"><i class="bi {{ category.icon }}"></i></div>
+          <h2 class="h6">{{ category.name }}</h2>
+          <p class="small text-muted mb-1 d-none d-sm-block">{{ category.description|truncatechars:70 }}</p>
+          <span class="small fw-bold text-brand">{{ category.total }} donation{{ category.total|pluralize }}</span>
+        </a>
+      </div>
+    {% endfor %}
+  </div>
+
+  <div class="d-flex justify-content-between align-items-end mb-3">
+    <div><div class="eyebrow">Happening now</div><h2 class="section-title mb-0">Active donation drives</h2></div>
+  </div>
+  <div class="row g-4 mb-5">
+    {% for drive in drives %}
+      <div class="col-md-6 col-lg-4" data-reveal>
+        <div class="k-card h-100">
+          <div class="k-cover {{ drive.category.gradient }}" style="aspect-ratio:16/6"><i class="bi {{ drive.category.icon }}" style="font-size:2.6rem"></i>
+            <span class="k-chip chip-cat">{{ drive.category.name }}</span>
+            <span class="k-chip chip-status">{{ drive.days_left }} day{{ drive.days_left|pluralize }} left</span></div>
+          <div class="k-card-body">
+            <h3 class="k-card-title">{{ drive.title }}</h3>
+            <p class="small text-muted mb-2">{{ drive.description }}</p>
+            <div class="small text-muted mb-3"><i class="bi bi-geo-alt"></i> {{ drive.location }}{% if drive.organizer %} · {{ drive.organizer }}{% endif %}</div>
+            <div class="mt-auto">
+              <div class="d-flex justify-content-between small mb-1"><strong>{{ drive.collected_quantity }} {{ drive.unit }}</strong><span class="text-muted">goal {{ drive.goal_quantity }}</span></div>
+              {% include "partials/progress.html" with percent=drive.progress_percent size="" %}
+              <a href="{% url 'donations:category' slug=drive.category.slug %}?drive={{ drive.pk }}" class="btn btn-primary w-100 mt-3">Contribute to this drive</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <div class="col-12">{% include "partials/empty_state.html" with icon="bi-calendar-event" title="No active drives right now" text="You can still donate directly using any category above." %}</div>
+    {% endfor %}
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-{% if user.is_authenticated %}7{% else %}12{% endif %}">
+      <div class="k-panel h-100">
+        <h2 class="h5 mb-3">Community activity</h2>
+        {% for d in community %}
+          <div class="contributor">
+            <span class="k-avatar sm {{ d.category.gradient }}" style="color:#fff"><i class="bi {{ d.category.icon }}"></i></span>
+            <div class="flex-grow-1">
+              <div class="fw-bold">{{ d.public_name }}</div>
+              <div class="small text-muted">
+                {% if d.is_money %}donated {{ d.amount|inr }} to {{ d.target_title }}{% else %}donated {{ d.quantity }} × {{ d.category.name }}{% endif %}
+              </div>
+            </div>
+            <div class="small text-muted">{{ d.created_at|timesince }} ago</div>
+          </div>
+        {% empty %}<p class="text-muted mb-0">No donations yet - be the first!</p>{% endfor %}
+      </div>
+    </div>
+    {% if user.is_authenticated %}
+    <div class="col-lg-5">
+      <div class="k-panel h-100">
+        <div class="d-flex justify-content-between"><h2 class="h5 mb-3">Your recent donations</h2><a href="{% url 'dashboard:history' %}" class="small fw-bold">View all</a></div>
+        {% for d in my_recent %}
+          <div class="contributor">
+            <div class="flex-grow-1"><div class="fw-bold">{{ d.category.name }}</div><div class="small text-muted">{{ d.target_title }}</div></div>
+            <div class="text-end"><div class="fw-bold">{% if d.is_money %}{{ d.amount|inr }}{% else %}{{ d.quantity }} item{{ d.quantity|pluralize }}{% endif %}</div><div class="small text-muted">{{ d.created_at|date:"d M" }}</div></div>
+          </div>
+        {% empty %}<p class="text-muted mb-0">You haven't donated yet. Pick a category above to get started.</p>{% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

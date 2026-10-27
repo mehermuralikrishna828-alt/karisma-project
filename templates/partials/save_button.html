@@ -1,0 +1,17 @@
+{% comment %}
+Params: url (POST endpoint), saved (bool), on_text, off_text, next (optional)
+{% endcomment %}
+{% if user.is_authenticated %}
+  <form method="post" action="{{ url }}" class="js-toggle-form d-inline">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-save {% if saved %}is-active{% endif %}" aria-pressed="{% if saved %}true{% else %}false{% endif %}"
+            data-on="{{ on_text|default:'Saved' }}" data-off="{{ off_text|default:'Save' }}">
+      <i class="bi {% if saved %}bi-bookmark-heart-fill{% else %}bi-bookmark-heart{% endif %}"></i>
+      <span class="js-label ms-1">{% if saved %}{{ on_text|default:'Saved' }}{% else %}{{ off_text|default:'Save' }}{% endif %}</span>
+    </button>
+  </form>
+{% else %}
+  <a class="btn btn-save" href="{% url 'accounts:login' %}?next={{ request.get_full_path|urlencode }}">
+    <i class="bi bi-bookmark-heart"></i> <span class="ms-1">{{ off_text|default:'Save' }}</span>
+  </a>
+{% endif %}

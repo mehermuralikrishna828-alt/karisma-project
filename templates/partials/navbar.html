@@ -1,0 +1,42 @@
+{% load static karisma_tags %}
+<header class="k-navbar">
+  <div class="container d-flex align-items-center justify-content-between gap-3">
+    <a href="{% url 'core:home' %}" class="k-brand" aria-label="Karisma home">
+      <img src="{% static 'images/logo.svg' %}" alt="" width="36" height="36"> Karisma
+    </a>
+    <div class="d-flex align-items-center gap-2">
+      {% if user.is_authenticated %}
+        <a href="{% url 'crowdfunding:create' %}" class="btn btn-primary btn-sm d-none d-sm-inline-flex align-items-center gap-1">
+          <i class="bi bi-plus-lg"></i> Start a campaign
+        </a>
+        <a href="{% url 'dashboard:notifications' %}" class="btn btn-light rounded-circle k-bell" aria-label="Notifications" style="width:40px;height:40px;padding:0;display:grid;place-items:center">
+          <i class="bi bi-bell"></i>
+          {% if unread_count %}<span class="badge rounded-pill text-bg-danger">{{ unread_count }}</span>{% endif %}
+        </a>
+        <div class="dropdown">
+          <button class="btn p-0 border-0" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Account menu" data-no-loading>
+            <span class="k-avatar">{% if user.profile.avatar %}<img src="{{ user.profile.avatar.url }}" alt="">{% else %}{{ user|initials }}{% endif %}</span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end shadow border-0 p-2" style="border-radius:16px;min-width:220px">
+            <li class="px-3 py-2"><div class="fw-bold">{{ user|display_name }}</div><div class="small text-muted">@{{ user.username }}</div></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item rounded-3" href="{% url 'dashboard:home' %}"><i class="bi bi-grid-1x2 me-2"></i>Dashboard</a></li>
+            <li><a class="dropdown-item rounded-3" href="{% url 'dashboard:campaigns' %}"><i class="bi bi-rocket-takeoff me-2"></i>My campaigns</a></li>
+            <li><a class="dropdown-item rounded-3" href="{% url 'dashboard:settings' %}"><i class="bi bi-gear me-2"></i>Account settings</a></li>
+            {% if user.is_staff %}<li><a class="dropdown-item rounded-3" href="{% url 'admin:index' %}"><i class="bi bi-shield-check me-2"></i>Admin panel</a></li>{% endif %}
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <form method="post" action="{% url 'accounts:logout' %}" data-no-loading>
+                {% csrf_token %}
+                <button type="submit" class="dropdown-item rounded-3 text-danger"><i class="bi bi-box-arrow-right me-2"></i>Log out</button>
+              </form>
+            </li>
+          </ul>
+        </div>
+      {% else %}
+        <a href="{% url 'accounts:login' %}" class="btn btn-light btn-sm">Log in</a>
+        <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-sm">Join Karisma</a>
+      {% endif %}
+    </div>
+  </div>
+</header>

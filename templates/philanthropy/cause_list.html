@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load karisma_tags %}
+{% block title %}Philanthropy causes{% endblock %}
+{% block content %}
+<div class="container page-head">
+  <div class="eyebrow">Philanthropy</div>
+  <h1 class="mb-1">Causes that create lasting impact</h1>
+  <p class="text-muted mb-4">Long-term programmes run with trusted partners. Support one, or follow it to stay updated.</p>
+
+  <form method="get" class="filter-bar mb-4" role="search" data-no-loading>
+    <div class="row g-2 align-items-end">
+      <div class="col-lg-5"><label class="form-label small" for="q">Search</label>
+        <input type="search" id="q" name="q" value="{{ filters.q }}" class="form-control" placeholder="Search by title, category or description"></div>
+      <div class="col-6 col-lg-3"><label class="form-label small" for="category">Category</label>
+        <select id="category" name="category" class="form-select"><option value="">All causes</option>
+          {% for value, label in categories %}<option value="{{ value }}" {% if filters.category == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+        </select></div>
+      <div class="col-6 col-lg-2"><label class="form-label small" for="sort">Sort</label>
+        <select id="sort" name="sort" class="form-select">
+          <option value="popular" {% if filters.sort == 'popular' %}selected{% endif %}>Most supporters</option>
+          <option value="recent" {% if filters.sort == 'recent' %}selected{% endif %}>Recently added</option>
+          <option value="funded" {% if filters.sort == 'funded' %}selected{% endif %}>Most funded</option>
+          <option value="title" {% if filters.sort == 'title' %}selected{% endif %}>A to Z</option>
+        </select></div>
+      <div class="col-lg-2 d-grid"><button class="btn btn-primary" type="submit"><i class="bi bi-funnel me-1"></i> Apply</button></div>
+    </div>
+    {% if has_filters %}<div class="mt-2"><a href="{% url 'philanthropy:list' %}" class="small fw-bold">Clear filters</a></div>{% endif %}
+  </form>
+
+  <div class="row g-4">
+    {% for cause in causes %}
+      <div class="col-md-6 col-lg-4">{% include "partials/cause_card.html" %}</div>
+    {% empty %}
+      <div class="col-12">{% include "partials/empty_state.html" with icon="bi-search-heart" title="No causes found" text="Try another keyword or clear the filters." cta_url="/philanthropy/" cta_label="Show all causes" %}</div>
+    {% endfor %}
+  </div>
+  {% include "partials/pagination.html" %}
+</div>
+{% endblock %}

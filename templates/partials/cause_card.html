@@ -1,0 +1,30 @@
+{% load karisma_tags %}
+<article class="k-card cause-card h-100" data-reveal>
+  <a href="{{ cause.get_absolute_url }}" class="k-cover {% if not cause.cover_image %}{{ cause.gradient }}{% endif %}" aria-label="{{ cause.title }}">
+    {% if cause.cover_image %}<img src="{{ cause.cover_image.url }}" alt="" loading="lazy">{% else %}<i class="bi {{ cause.icon }}"></i>{% endif %}
+    <span class="k-chip chip-cat">{{ cause.get_category_display }}</span>
+  </a>
+  <div class="k-card-body">
+    <h3 class="k-card-title"><a href="{{ cause.get_absolute_url }}">{{ cause.title }}</a></h3>
+    <p class="text-muted small mb-3">{{ cause.description|truncatechars:120 }}</p>
+    {% if cause.stats_list %}
+      <div class="row g-2 mb-3 text-center">
+        {% for stat in cause.stats_list|slice:":2" %}
+          <div class="col-6"><div class="impact-stat py-2"><div class="v fs-6">{{ stat.value }}</div><div class="small text-muted lh-sm">{{ stat.label }}</div></div></div>
+        {% endfor %}
+      </div>
+    {% endif %}
+    <div class="mt-auto">
+      <div class="d-flex justify-content-between align-items-baseline mb-2">
+        <span class="amount-raised">{{ cause.amount_raised|compact_inr }}</span>
+        <span class="small text-muted">of {{ cause.target_amount|compact_inr }} · {{ cause.raw_percent }}%</span>
+      </div>
+      {% include "partials/progress.html" with percent=cause.progress_percent size="" %}
+      <div class="d-flex gap-2 mt-3">
+        <a href="{% url 'donations:flow' kind='cause' slug=cause.slug step='amount' %}" class="btn btn-primary flex-grow-1"><i class="bi bi-heart-fill me-1"></i> Support Cause</a>
+        {% url 'philanthropy:toggle_follow' slug=cause.slug as follow_url %}
+        {% include "partials/save_button.html" with url=follow_url saved=cause.pk|in_set:followed_cause_ids on_text="Following" off_text="Follow" %}
+      </div>
+    </div>
+  </div>
+</article>

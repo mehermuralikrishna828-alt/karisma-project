@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Log in{% endblock %}
+{% block content %}
+<div class="container section">
+  <div class="auth-card k-panel p-4 p-md-5">
+    <h1 class="h3 mb-1">Welcome back</h1>
+    <p class="text-muted mb-4">Log in to track your donations and campaigns.</p>
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% include "partials/form_errors.html" %}
+      <input type="hidden" name="next" value="{{ request.GET.next }}">
+      {% for field in form %}<div class="mb-3">{% include "partials/form_field.html" %}</div>{% endfor %}
+      <button type="submit" class="btn btn-primary w-100 py-2">Log in</button>
+    </form>
+    <p class="text-center text-muted small mt-4 mb-0">New to Karisma? <a href="{% url 'accounts:register' %}" class="fw-bold">Create an account</a></p>
+    <div class="demo-banner mt-4"><i class="bi bi-lightbulb"></i><div>Demo data loaded? Try username <strong>demo</strong> with password <strong>Karisma@123</strong>.</div></div>
+  </div>
+</div>
+{% endblock %}

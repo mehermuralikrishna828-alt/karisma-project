@@ -1,0 +1,35 @@
+{% extends "dashboard/base_dashboard.html" %}
+{% load karisma_tags %}
+{% block title %}Donation history{% endblock %}
+{% block dash_content %}
+<form method="get" class="mb-3 d-flex gap-2 flex-wrap" data-no-loading>
+  <select name="category" class="form-select" style="max-width:240px" aria-label="Filter by category" onchange="this.form.submit()">
+    <option value="">All categories</option>
+    {% for c in categories %}<option value="{{ c.slug }}" {% if selected_category == c.slug %}selected{% endif %}>{{ c.name }}</option>{% endfor %}
+  </select>
+</form>
+<div class="k-panel p-0">
+  {% if donations %}
+  <div class="table-responsive">
+    <table class="table align-middle mb-0">
+      <thead><tr class="small text-muted"><th>Date</th><th>Category</th><th>Supported</th><th>Reference</th><th>Status</th><th class="text-end">Amount / Qty</th></tr></thead>
+      <tbody>
+      {% for d in donations %}
+        <tr>
+          <td class="text-nowrap">{{ d.created_at|date:"d M Y" }}</td>
+          <td><i class="bi {{ d.category.icon }} text-brand me-1"></i>{{ d.category.name }}</td>
+          <td>{% if d.campaign %}<a href="{{ d.campaign.get_absolute_url }}">{{ d.target_title }}</a>{% elif d.cause %}<a href="{{ d.cause.get_absolute_url }}">{{ d.target_title }}</a>{% else %}{{ d.target_title }}{% endif %}</td>
+          <td><a href="{% url 'donations:success' reference=d.reference %}" class="small">{{ d.reference }}</a></td>
+          <td><span class="badge rounded-pill text-bg-{% if d.status == 'completed' %}success{% elif d.status == 'pending' %}warning{% else %}secondary{% endif %}">{{ d.get_status_display }}</span></td>
+          <td class="text-end fw-bold">{% if d.is_money %}{{ d.amount|inr }}{% else %}{{ d.quantity }}{% endif %}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+    {% include "partials/empty_state.html" with icon="bi-receipt" title="No donations found" text="When you donate, your history will appear here." cta_url="/donations/" cta_label="Make a donation" %}
+  {% endif %}
+</div>
+{% include "partials/pagination.html" %}
+{% endblock %}

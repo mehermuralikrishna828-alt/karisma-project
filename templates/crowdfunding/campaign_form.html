@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}{{ page_title }}{% endblock %}
+{% block content %}
+<div class="container page-head">
+  <div class="row justify-content-center">
+    <div class="col-lg-9 col-xl-8">
+      <div class="eyebrow">Crowdfunding</div>
+      <h1 class="mb-1">{{ page_title }}</h1>
+      <p class="text-muted mb-4">Tell your story clearly. Campaigns with specific goals, photos and updates raise more.</p>
+      <form method="post" enctype="multipart/form-data" class="k-panel p-4" novalidate>
+        {% csrf_token %}
+        {% include "partials/form_errors.html" %}
+        <div class="row g-3">
+          {% for field in form %}
+            <div class="{% if field.name in 'description impact_info short_description title image' %}col-12{% else %}col-md-6{% endif %}">
+              {% include "partials/form_field.html" %}
+            </div>
+          {% endfor %}
+        </div>
+        <div class="d-flex gap-2 mt-4">
+          <button type="submit" class="btn btn-primary px-4">{{ submit_label }}</button>
+          <a href="{% if object %}{{ object.get_absolute_url }}{% else %}{% url 'crowdfunding:list' %}{% endif %}" class="btn btn-light">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

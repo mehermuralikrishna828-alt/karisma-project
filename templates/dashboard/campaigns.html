@@ -1,0 +1,29 @@
+{% extends "dashboard/base_dashboard.html" %}
+{% load karisma_tags %}
+{% block title %}My campaigns{% endblock %}
+{% block dash_content %}
+{% if campaigns %}
+  <div class="row g-3">
+    {% for c in campaigns %}
+      <div class="col-lg-6">
+        <div class="k-panel h-100">
+          <div class="d-flex justify-content-between gap-2 mb-2">
+            <h2 class="h6 mb-0"><a href="{{ c.get_absolute_url }}" class="text-body">{{ c.title }}</a></h2>
+            <span class="badge rounded-pill text-bg-{{ c.status_badge }} align-self-start">{{ c.status_label }}</span>
+          </div>
+          <div class="d-flex justify-content-between small mb-1"><strong>{{ c.amount_raised|inr }}</strong><span class="text-muted">of {{ c.target_amount|inr }}</span></div>
+          {% include "partials/progress.html" with percent=c.progress_percent size="" %}
+          <div class="small text-muted mt-2">{{ c.contributors_count }} contributors · deadline {{ c.deadline|date:"d M Y" }}{% if c.is_verified %} · <i class="bi bi-patch-check-fill verified-inline"></i> verified{% else %} · awaiting verification{% endif %}</div>
+          <div class="d-flex gap-2 mt-3">
+            <a href="{{ c.get_absolute_url }}#updates" class="btn btn-outline-primary btn-sm">Post update</a>
+            <a href="{% url 'crowdfunding:edit' slug=c.slug %}" class="btn btn-light btn-sm">Edit</a>
+            <a href="{% url 'crowdfunding:delete' slug=c.slug %}" class="btn btn-light btn-sm text-danger">Delete</a>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  {% include "partials/empty_state.html" with icon="bi-rocket-takeoff" title="You haven't started a campaign" text="Share your story and let the community help." cta_url="/crowdfunding/create/" cta_label="Start a campaign" %}
+{% endif %}
+{% endblock %}

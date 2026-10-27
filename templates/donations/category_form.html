@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load karisma_tags %}
+{% block title %}Donate {{ category.name }}{% endblock %}
+{% block content %}
+<div class="container page-head">
+  <nav aria-label="breadcrumb" class="mb-3"><ol class="breadcrumb small mb-0">
+    <li class="breadcrumb-item"><a href="{% url 'donations:index' %}">Donations</a></li>
+    <li class="breadcrumb-item active" aria-current="page">{{ category.name }}</li>
+  </ol></nav>
+  <div class="row g-4">
+    <div class="col-lg-8">
+      <div class="d-flex align-items-center gap-3 mb-3">
+        <div class="stat-card p-0 d-grid {{ category.gradient }}" style="width:64px;height:64px;place-items:center;color:#fff;font-size:1.8rem;border:0"><i class="bi {{ category.icon }}"></i></div>
+        <div><h1 class="mb-0 h2">Donate: {{ category.name }}</h1><p class="text-muted mb-0">{{ category.description }}</p></div>
+      </div>
+
+      {% if drive %}
+        <div class="demo-banner mb-3" style="background:#f0fdfa;border-color:#14b8a6;color:#115e59"><i class="bi bi-calendar-heart"></i>
+          <div>Contributing to drive: <strong>{{ drive.title }}</strong> ({{ drive.location }})</div></div>
+      {% endif %}
+      {% if category.slug == 'blood' %}
+        <div class="alert alert-danger rounded-4"><i class="bi bi-droplet-half"></i> Registration is not an appointment. A coordinator will contact you to confirm eligibility and schedule your donation at a certified blood bank.</div>
+      {% endif %}
+
+      <form method="post" class="k-panel p-4" novalidate>
+        {% csrf_token %}
+        {% include "partials/form_errors.html" %}
+        <div class="row g-3">
+          {% for field in form %}
+            <div class="{% if field.field.widget.input_type == 'checkbox' or field.name == 'pickup_address' or field.name == 'message' or field.name == 'item_description' or field.name == 'item_name' or field.name == 'food_item' %}col-12{% else %}col-md-6{% endif %}">
+              {% include "partials/form_field.html" %}
+            </div>
+          {% endfor %}
+        </div>
+        {% if not user.is_authenticated %}
+          <div class="alert alert-info rounded-4 mt-3 mb-0"><i class="bi bi-info-circle"></i> You'll be asked to <a href="{% url 'accounts:login' %}?next={{ request.get_full_path|urlencode }}" class="fw-bold">log in</a> when you submit.</div>
+        {% endif %}
+        <button type="submit" class="btn btn-primary btn-lg mt-4 px-4"><i class="bi bi-send-check me-1"></i> {{ form.submit_label }}</button>
+      </form>
+    </div>
+
+    <div class="col-lg-4">
+      {% if drives %}
+        <div class="k-panel mb-4">
+          <h2 class="h6 mb-3">Active drives for {{ category.name }}</h2>
+          {% for d in drives %}
+            <div class="mb-3">
+              <a href="?drive={{ d.pk }}" class="fw-bold">{{ d.title }}</a>
+              <div class="small text-muted mb-1">{{ d.location }}</div>
+              {% include "partials/progress.html" with percent=d.progress_percent size="" %}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+      <div class="k-panel">
+        <h2 class="h6 mb-3">Recent {{ category.name|lower }} donors</h2>
+        {% for d in recent %}
+          <div class="contributor"><div class="flex-grow-1"><div class="fw-bold">{{ d.public_name }}</div><div class="small text-muted">{{ d.quantity }} {% if d.quantity == 1 %}item{% else %}items{% endif %}</div></div><div class="small text-muted">{{ d.created_at|timesince }} ago</div></div>
+        {% empty %}<p class="text-muted small mb-0">Be the first to donate in this category.</p>{% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

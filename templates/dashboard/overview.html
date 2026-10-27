@@ -1,0 +1,72 @@
+{% extends "dashboard/base_dashboard.html" %}
+{% load static karisma_tags %}
+{% block title %}Dashboard{% endblock %}
+{% block dash_content %}
+<div class="row g-4">
+  <div class="col-lg-4">
+    <div class="k-panel text-center h-100">
+      <span class="k-avatar lg mb-3">{% if profile.avatar %}<img src="{{ profile.avatar.url }}" alt="">{% else %}{{ user|initials }}{% endif %}</span>
+      <h2 class="h5 mb-0">{{ user|display_name }}</h2>
+      <div class="text-muted small">@{{ user.username }}</div>
+      <div class="small text-muted mt-2">{{ user.email }}</div>
+      {% if profile.location %}<div class="small text-muted"><i class="bi bi-geo-alt"></i> {{ profile.location }}</div>{% endif %}
+      {% if profile.bio %}<p class="small mt-3 mb-0">{{ profile.bio }}</p>{% endif %}
+      <a href="{% url 'dashboard:settings' %}" class="btn btn-outline-primary btn-sm mt-3">Edit profile</a>
+    </div>
+  </div>
+  <div class="col-lg-8">
+    <div class="row g-3">
+      <div class="col-6 col-md-3"><div class="stat-card"><div class="icon grad-emerald"><i class="bi bi-currency-rupee"></i></div><div class="value">{{ stats.total_donated|compact_inr }}</div><div class="small text-muted">Money donated</div></div></div>
+      <div class="col-6 col-md-3"><div class="stat-card"><div class="icon grad-sky"><i class="bi bi-rocket-takeoff"></i></div><div class="value" data-countup="{{ stats.campaigns_supported }}">{{ stats.campaigns_supported }}</div><div class="small text-muted">Campaigns supported</div></div></div>
+      <div class="col-6 col-md-3"><div class="stat-card"><div class="icon grad-amber"><i class="bi bi-box2-heart"></i></div><div class="value" data-countup="{{ stats.items_donated }}">{{ stats.items_donated }}</div><div class="small text-muted">Items donated</div></div></div>
+      <div class="col-6 col-md-3"><div class="stat-card"><div class="icon grad-rose"><i class="bi bi-globe-central-south-asia"></i></div><div class="value" data-countup="{{ stats.causes_supported }}">{{ stats.causes_supported }}</div><div class="small text-muted">Causes supported</div></div></div>
+    </div>
+    <div class="k-panel mt-3">
+      <h2 class="h6">Donations over time</h2>
+      {% if has_activity %}<div class="chart-box"><canvas id="chartTimeline" aria-label="Donations over time"></canvas></div>
+      {% else %}{% include "partials/empty_state.html" with icon="bi-graph-up" title="No donations yet" text="Your giving trends will appear here." cta_url="/crowdfunding/" cta_label="Find a campaign" %}{% endif %}
+    </div>
+  </div>
+</div>
+
+{% if has_activity %}
+<div class="row g-4 mt-1">
+  <div class="col-md-5"><div class="k-panel h-100"><h2 class="h6">Donations by category</h2><div class="chart-box"><canvas id="chartCategory"></canvas></div></div></div>
+  <div class="col-md-7"><div class="k-panel h-100"><h2 class="h6">Where your money went</h2><div class="chart-box"><canvas id="chartDistribution"></canvas></div></div></div>
+</div>
+{% endif %}
+
+<div class="row g-4 mt-1">
+  <div class="col-lg-7">
+    <div class="k-panel h-100">
+      <div class="d-flex justify-content-between"><h2 class="h6">Recent donations</h2><a href="{% url 'dashboard:history' %}" class="small fw-bold">View all</a></div>
+      {% for d in recent_donations %}
+        <div class="contributor">
+          <span class="k-avatar sm {{ d.category.gradient }}" style="color:#fff"><i class="bi {{ d.category.icon }}"></i></span>
+          <div class="flex-grow-1"><div class="fw-bold">{{ d.target_title }}</div><div class="small text-muted">{{ d.category.name }} · {{ d.created_at|date:"d M Y" }}</div></div>
+          <div class="fw-bold">{% if d.is_money %}{{ d.amount|inr }}{% else %}{{ d.quantity }} item{{ d.quantity|pluralize }}{% endif %}</div>
+        </div>
+      {% empty %}<p class="text-muted mb-0">Nothing here yet.</p>{% endfor %}
+    </div>
+  </div>
+  <div class="col-lg-5">
+    <div class="k-panel h-100">
+      <div class="d-flex justify-content-between"><h2 class="h6">Notifications</h2><a href="{% url 'dashboard:notifications' %}" class="small fw-bold">View all</a></div>
+      {% for n in notifications %}
+        <a href="{% url 'dashboard:notification_open' pk=n.pk %}" class="notif {% if not n.is_read %}unread{% endif %}">
+          <span class="ico"><i class="bi {{ n.icon }}"></i></span>
+          <span><span class="fw-bold d-block">{{ n.title }}</span><span class="small text-muted">{{ n.created_at|timesince }} ago</span></span>
+        </a>
+      {% empty %}<p class="text-muted mb-0">You're all caught up.</p>{% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% if has_activity %}
+  {{ chart_data|json_script:"chart-data" }}
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <script src="{% static 'js/dashboard.js' %}"></script>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Create your account{% endblock %}
+{% block content %}
+<div class="container section">
+  <div class="auth-card k-panel p-4 p-md-5" style="max-width:560px">
+    <h1 class="h3 mb-1">Join Karisma</h1>
+    <p class="text-muted mb-4">Create an account to donate, save campaigns and start your own.</p>
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% include "partials/form_errors.html" %}
+      <div class="row g-3">
+        {% for field in form %}
+          <div class="{% if field.name == 'first_name' or field.name == 'last_name' %}col-sm-6{% else %}col-12{% endif %}">{% include "partials/form_field.html" %}</div>
+        {% endfor %}
+      </div>
+      <button type="submit" class="btn btn-primary w-100 py-2 mt-4">Create account</button>
+    </form>
+    <p class="text-center text-muted small mt-4 mb-0">Already have an account? <a href="{% url 'accounts:login' %}" class="fw-bold">Log in</a></p>
+  </div>
+</div>
+{% endblock %}

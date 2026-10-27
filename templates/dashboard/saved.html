@@ -1,0 +1,14 @@
+{% extends "dashboard/base_dashboard.html" %}
+{% block title %}Saved{% endblock %}
+{% block dash_content %}
+<h2 class="h5 mb-3">Saved campaigns</h2>
+<div class="row g-4 mb-5">
+  {% for campaign in saved_campaigns %}<div class="col-md-6 col-lg-4">{% include "partials/campaign_card.html" %}</div>
+  {% empty %}<div class="col-12">{% include "partials/empty_state.html" with icon="bi-bookmark-heart" title="No saved campaigns" text="Tap Save on any campaign to keep it here." cta_url="/crowdfunding/" cta_label="Browse campaigns" %}</div>{% endfor %}
+</div>
+<h2 class="h5 mb-3">Causes you follow</h2>
+<div class="row g-4">
+  {% for cause in followed_causes %}<div class="col-md-6 col-lg-4">{% include "partials/cause_card.html" %}</div>
+  {% empty %}<div class="col-12">{% include "partials/empty_state.html" with icon="bi-globe-central-south-asia" title="You're not following any causes" text="Follow causes to keep up with their impact." cta_url="/philanthropy/" cta_label="Explore causes" %}</div>{% endfor %}
+</div>
+{% endblock %}

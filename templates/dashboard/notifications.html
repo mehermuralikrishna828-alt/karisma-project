@@ -1,0 +1,19 @@
+{% extends "dashboard/base_dashboard.html" %}
+{% block title %}Notifications{% endblock %}
+{% block dash_content %}
+<div class="d-flex justify-content-end mb-2">
+  {% if unread_count %}<form method="post" action="{% url 'dashboard:notifications_read_all' %}" data-no-loading>{% csrf_token %}<button class="btn btn-light btn-sm">Mark all as read</button></form>{% endif %}
+</div>
+<div class="k-panel p-2">
+  {% for n in notifications %}
+    <a href="{% url 'dashboard:notification_open' pk=n.pk %}" class="notif {% if not n.is_read %}unread{% endif %}">
+      <span class="ico"><i class="bi {{ n.icon }}"></i></span>
+      <span class="flex-grow-1"><span class="fw-bold d-block">{{ n.title }}</span>{% if n.message %}<span class="small d-block">{{ n.message }}</span>{% endif %}<span class="small text-muted">{{ n.created_at|timesince }} ago · {{ n.get_kind_display }}</span></span>
+      {% if not n.is_read %}<span class="badge text-bg-primary align-self-start">New</span>{% endif %}
+    </a>
+  {% empty %}
+    {% include "partials/empty_state.html" with icon="bi-bell-slash" title="No notifications" text="Donation receipts, campaign updates and reminders will show up here." %}
+  {% endfor %}
+</div>
+{% include "partials/pagination.html" %}
+{% endblock %}

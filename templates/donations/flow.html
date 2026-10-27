@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% load karisma_tags %}
+{% block title %}Support {{ target_title }}{% endblock %}
+{% block content %}
+<div class="container page-head">
+  <div class="row justify-content-center g-4">
+    <div class="col-lg-7">
+      <a href="{{ back_url }}" class="small fw-bold"><i class="bi bi-arrow-left"></i> Back</a>
+      <h1 class="h2 mt-2 mb-3">Support {{ target_title }}</h1>
+      <div class="demo-banner mb-4">
+        <i class="bi bi-shield-exclamation fs-5"></i>
+        <div><strong>Demo donation flow.</strong> Karisma does not process real payments. Nothing will be charged - your donation is only simulated and recorded in this demo database.</div>
+      </div>
+
+      <div class="flow-steps" aria-label="Donation steps">
+        <div class="flow-step {% if step_index > 1 %}done{% elif step_index == 1 %}current{% endif %}"><div class="dot">{% if step_index > 1 %}<i class="bi bi-check-lg"></i>{% else %}1{% endif %}</div>Amount</div>
+        <div class="flow-step {% if step_index > 2 %}done{% elif step_index == 2 %}current{% endif %}"><div class="dot">{% if step_index > 2 %}<i class="bi bi-check-lg"></i>{% else %}2{% endif %}</div>Your details</div>
+        <div class="flow-step {% if step_index == 3 %}current{% endif %}"><div class="dot">3</div>Review</div>
+        <div class="flow-step"><div class="dot">4</div>Confirmed</div>
+      </div>
+
+      <div class="k-panel p-4">
+        {% if step == 'amount' %}
+          <h2 class="h5 mb-3">Select an amount</h2>
+          <form method="post" novalidate>
+            {% csrf_token %}
+            <div class="d-flex flex-wrap gap-2 mb-3" data-amount-target="#id_amount">
+              {% for amt in quick_amounts %}<button type="button" class="amount-chip" data-amount="{{ amt }}">₹{{ amt }}</button>{% endfor %}
+            </div>
+            <label class="form-label" for="id_amount">Or enter your own amount (₹)</label>
+            <div class="input-group mb-1">
+              <span class="input-group-text bg-white" style="border-radius:14px 0 0 14px">₹</span>
+              {{ form.amount }}
+            </div>
+            {% for error in form.amount.errors %}<div class="text-danger small fw-semibold mt-1">{{ error }}</div>{% endfor %}
+            <div class="form-text mb-4">Minimum ₹10 · Maximum ₹10,00,000 per donation.</div>
+            <button type="submit" class="btn btn-primary px-4">Continue <i class="bi bi-arrow-right"></i></button>
+          </form>
+
+        {% elif step == 'details' %}
+          <h2 class="h5 mb-3">Donor information</h2>
+          <form method="post" novalidate>
+            {% csrf_token %}
+            {% include "partials/form_errors.html" %}
+            <div class="row g-3">
+              {% for field in form %}
+                <div class="{% if field.name in 'message is_anonymous' %}col-12{% else %}col-md-6{% endif %}">{% include "partials/form_field.html" %}</div>
+              {% endfor %}
+            </div>
+            <div class="d-flex gap-2 mt-4">
+              <a href="{% url 'donations:flow' kind=kind slug=target_slug step='amount' %}" class="btn btn-light">Back</a>
+              <button type="submit" class="btn btn-primary px-4">Review donation <i class="bi bi-arrow-right"></i></button>
+            </div>
+          </form>
+
+        {% else %}
+          <h2 class="h5 mb-3">Review your donation</h2>
+          <dl class="row mb-0">
+            <dt class="col-sm-4 text-muted fw-semibold">Supporting</dt><dd class="col-sm-8 fw-bold">{{ target_title }}<div class="small text-muted fw-normal">{{ target_subtitle }}</div></dd>
+            <dt class="col-sm-4 text-muted fw-semibold">Amount</dt><dd class="col-sm-8 fw-bold fs-4 text-brand">{{ amount|inr }}</dd>
+            <dt class="col-sm-4 text-muted fw-semibold">Donor</dt><dd class="col-sm-8">{{ donor.donor_name }}<div class="small text-muted">{{ donor.donor_email }}</div></dd>
+            <dt class="col-sm-4 text-muted fw-semibold">Payment</dt><dd class="col-sm-8">{{ donor.payment_method|upper }} <span class="badge text-bg-warning">Simulated</span></dd>
+            {% if donor.message %}<dt class="col-sm-4 text-muted fw-semibold">Message</dt><dd class="col-sm-8">“{{ donor.message }}”</dd>{% endif %}
+            <dt class="col-sm-4 text-muted fw-semibold">Visibility</dt><dd class="col-sm-8">{% if donor.is_anonymous %}Anonymous{% else %}Public (your name is shown){% endif %}</dd>
+          </dl>
+          <hr>
+          <form method="post">
+            {% csrf_token %}
+            <div class="d-flex flex-wrap gap-2">
+              <a href="{% url 'donations:flow' kind=kind slug=target_slug step='details' %}" class="btn btn-light">Edit details</a>
+              <button type="submit" class="btn btn-primary px-4"><i class="bi bi-check2-circle me-1"></i> Confirm demo donation of {{ amount|inr }}</button>
+            </div>
+          </form>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="k-panel">
+        <div class="eyebrow mb-2">Your impact</div>
+        <h2 class="h6">{{ target_title }}</h2>
+        {% if campaign %}
+          <div class="small text-muted mb-2">{{ campaign.amount_raised|inr }} raised of {{ campaign.target_amount|inr }}</div>
+          {% include "partials/progress.html" with percent=campaign.progress_percent size="" %}
+          {% if campaign.impact_info %}<p class="small text-muted mt-3 mb-0">{{ campaign.impact_info|truncatechars:160 }}</p>{% endif %}
+        {% elif cause %}
+          <div class="small text-muted mb-2">{{ cause.amount_raised|inr }} raised of {{ cause.target_amount|inr }}</div>
+          {% include "partials/progress.html" with percent=cause.progress_percent size="" %}
+          {% if cause.impact_note %}<p class="small text-muted mt-3 mb-0">{{ cause.impact_note }}</p>{% endif %}
+        {% else %}
+          <p class="small text-muted mb-0">The General Fund backs Karisma's pickup logistics, verification work and emergency relief.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
